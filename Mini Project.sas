@@ -308,4 +308,39 @@ proc sort data=wireless_tn;
 run;
 
 
+************* Tests for statistical Signifance of Findings ************************
+
+
+data wireless_tn1;
+set wireless;
+if   0 <tenure<= 29 then tn_grp =  '         0-29';
+else if 30 <tenure<= 59 then tn_grp   ='030 - 59';
+else if 60 <tenure<= 119 then tn_grp  ='060 - 119';
+else if 120 <tenure<= 179 then tn_grp ='120 - 179';
+else if 180 <tenure<= 359 then tn_grp ='180 - 359';
+else if tenure>= 360 then tn_grp ='360 and above';
+
+*if tenure >= 360 then tn_grp ='360 or High';
+*else tn_grp='Other';
+run;
+%mprint(wireless_tn1,10);
+
+proc freq data = wireless_tn1;
+tables active*tn_grp 
+/chisq 
+;
+run;
+
+
+%macro tts(var= );
+
+proc ttest data=wireless_tn1;
+  class &var;
+  var sales;
+  title "TTEST for &var";
+run;
+%mend;
+%tts(var=active);
+%tts(var=goodcredit);
+%tts(var=tn_grp);
 
